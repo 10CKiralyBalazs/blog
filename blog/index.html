@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <title>Blog kezelő</title>
+</head>
+<body>
+  <h1>Blog posztok</h1>
+  <div id="blog-list"></div>
+
+  <h2>Új / Szerkesztés</h2>
+  <form id="blog-form">
+    <input type="hidden" id="blog-id">
+    <input type="text" id="author" placeholder="Szerző" required><br>
+    <input type="text" id="title" placeholder="Cím" required><br>
+    <input type="text" id="category" placeholder="Kategória" required><br>
+    <textarea id="content" placeholder="Tartalom" required></textarea><br>
+    <button type="submit">Mentés</button>
+  </form>
+
+  <script>
+    async function fetchBlogs() {
+      const res = await fetch('http://localhost:5000/blogs');
+      const blogs = await res.json();
+      const list = document.getElementById('blog-list');
+      list.innerHTML = blogs.map(b => `
+        <div>
+          <h3>${b.title} (${b.category})</h3>
+          <p><strong>${b.author}</strong> - ${new Date(b.createdAt).toLocaleString()}</p>
+          <p>${b.content}</p>
+          <button onclick="editBlog('${b._id}')">Szerkesztés</button>
+          <button onclick="deleteBlog('${b._id}')">Törlés</button>
+        </div>
+      `).join('');
+    }
+
+    async function deleteBlog(id) {
+      await fetch(`http://localhost:5000/blogs/${id}`, { method: 'DELETE' });
+      fetchBlogs();
+    }
+
+    function editBlog(id) {
+      const blog = Array.from(document.querySelectorAll('#blog-list div')).find(d => d.innerHTML.includes(id));
+      const blogData = JSON.parse(localStorage.getItem('blogs')).find(b => b._id === id);
+      document.getElementById('blog-id').value = blogData._id;
+      document.getElementById('author').value = blogData.author;
+      document.getElementById('title').value = blogData.title;
+      document.getElementById('category').value = blogData.category;
+      document.getElementById('content').value = blogData.content;
+    }
+
+    document.getElementById('blog-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('blog-id').value;
+      const blog = {
+        author: document.getElementById('author').value,
+        title: document.getElementById('title').value,
+        category: document.getElementById('category').value,
+        content: document.getElementById('content').value
+      };
+
+      if (id) {
+        await fetch(`http://localhost:5000/blogs/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(blog)
+        });
+      } else {
+        await fetch('http://localhost:5000/blogs', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(blog)
+        });
+      }
+
+      document.getElementById('blog-form').reset();
+      fetchBlogs();
+    });
+
+    fetchBlogs();
+  </script>
+</body>
+</html>

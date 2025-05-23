@@ -1,0 +1,17 @@
+{
+  "name": "12.javascript",
+  "version": "1.0.0",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodeman app.js"
+  },
+  "keywords": [],
+  "author": "Anti",
+  "license": "ISC",
+  "description": "node példa és expresss használata",
+  "dependencies": {
+    "express": "^4,21,2"
+  }
+}
