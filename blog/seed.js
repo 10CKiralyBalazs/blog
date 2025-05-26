@@ -15,7 +15,6 @@ async function seed() {
     { author: users[2], title: 'Poszt 5', category: 'Tech', content: 'Ötödik poszt...', createdAt: new Date(), updatedAt: new Date() },
     { author: users[2], title: 'Poszt 6', category: 'Tudomány', content: 'Hatodik poszt...', createdAt: new Date(), updatedAt: new Date() },
   ];
-
   await Blog.insertMany(blogs);
   console.log('Adatbázis feltöltve.');
   process.exit();
